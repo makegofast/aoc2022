@@ -19,16 +19,15 @@ class Elves(object):
     def sum_top_calories(self, count):
         return sum([e.total_rations for e in sorted(self.elves, key=lambda x: x.total_rations)[-count:]])
 
-class day_1(object):
+class Solver(object):
     @staticmethod
     def get_data(filename):
-        for line in open(filename, 'rt'):
-            yield line.strip()
+        with open(filename, 'rt') as fp:
+            for line in fp:
+                yield line.strip()
 
     def solve(self, filename):
         data = self.get_data(filename)
-
-        buffer = []
 
         elves = Elves()
         elf = Elf()
@@ -41,10 +40,21 @@ class day_1(object):
 
         elves.add_elf(elf)
 
-        print(f'part 1: {elves.sum_top_calories(1)}')
-        print(f'part 2: {elves.sum_top_calories(3)}')
+        part1 = elves.sum_top_calories(1)
+        print(f'part 1: {part1}')
+
+        part2 = elves.sum_top_calories(3)
+        print(f'part 2: {part2}') 
+
+        return (part1, part2)
+
 
 if __name__ == "__main__":
-    day1 = day_1()
-    day1.solve('test_data.txt')
-    day1.solve('data.txt')
+    solver = Solver()
+    print("Running Tests...")
+    if not solver.solve('test_data.txt') == (24000, 45000):
+        raise ValueError("Tests Failed")
+
+    print("Solving...")
+    solver = Solver()
+    solver.solve('data.txt')
