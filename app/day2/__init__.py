@@ -5,10 +5,19 @@ class Solver(object):
     @staticmethod
     def get_data(filename):
         with open(filename, 'rt') as fp:
-            c = 0
             while line := fp.readline().rstrip().split():
-                c += 1
                 yield line[0], line[1]
+
+    @staticmethod
+    def score_round(o, p):
+        shape_score = Solver.shape_scores[p]
+
+        if o == p:
+            return 3 + shape_score 
+        elif o+p in Solver.winning_combos:
+            return 6 + shape_score
+        else:
+            return shape_score
 
     def solve_part_1(self, filename):
         crypt_map = {'A': 'R', 'B': 'P', 'C': 'S', 'X': 'R', 'Y': 'P', 'Z': 'S'} 
@@ -16,14 +25,7 @@ class Solver(object):
 
         for o, p in self.get_data(filename):
             o, p = (crypt_map[o], crypt_map[p]) 
-            shape_score = Solver.shape_scores[p]
-
-            if o == p:
-                score += 3 + shape_score 
-            elif o+p in Solver.winning_combos:
-                score += 6 + shape_score
-            else:
-                score += shape_score 
+            score += Solver.score_round(o, p)
 
         print(f'part 1 score: {score}')
         return score
@@ -44,14 +46,7 @@ class Solver(object):
             else:
                 p = losing_map[o]
 
-            shape_score = Solver.shape_scores[p]
-
-            if o == p:
-                score += 3 + shape_score 
-            elif o+p in Solver.winning_combos:
-                score += 6 + shape_score
-            else:
-                score += shape_score 
+            score += Solver.score_round(o, p)
 
         print(f'part 2 score: {score}')
         return score
