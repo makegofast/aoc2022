@@ -1,7 +1,7 @@
 class Solver(object):
     @staticmethod
     def get_data(filename):
-        return open(filename, 'rt').read():
+        return open(filename, 'rt').read()
 
     def solve_part_1(self, filename):
         pass
