@@ -1,44 +1,58 @@
+import numpy
 import math
 
 class Item(object):
     def __init__(self, start):
-        self.start = start
-        self.operations = []
+        print(f'created new item with {start}')
+        self.value = start
+        self.primes = [2,3,5,7,11,13,17,19]
+        #self.primes = [23,19,13,17]
+        self.values = {p: start for p in self.primes}
+
+    def __floordiv__(self, divisor):
+        self.value //= divisor
+        return self
+
+    def __mod__(self, other):
+        return self.value % other
 
     def __int__(self):
-        num = self.start
-        for operation in self.operations:
-            num = self.apply_operation(num, operation)
-        
-        return num
+        return self.value
     
-    def add_operation(self, operation):
-        self.operations.append(operation)
+    def add_operation(self, operation, use_part_2):
+        if use_part_2:
+            for p in self.primes:
+                if self.values[p] <= 0:
+                    raise ValueError(f'wtf {self.values[p]} {p}')
 
-    def apply_operation(self, old, operation):
-        #print(f'applying {operation} to {self.start}')
+                self.values[p] = self.apply_operation(self.values[p], operation, p)
+        else:
+            self.value = self.apply_operation(self.value, operation)
+    
+    def apply_operation(self, old, operation, reduce=None):
+        if old <= 0:
+            raise ValueError(f'wtf2 {old}')
+        #print(f'apply_operation {reduce} {operation} to {old}')
         _, operator, value = operation
         value = int(value) if value.isnumeric() else value
 
-        if operator == '*' and value == 'old':
-            return old * old 
-        elif operator == '+':
-            return old + value
-        elif operator == '*':
-            return old * value
+        if reduce and operator == '*' and old % reduce == 0:
+            old = reduce
 
-    def is_divisible_by(self, divisor):
-        print(f'running is_divisible_by({divisor}) with {len(self.operations)} operations')
-        num = self.start
-        for operation in self.operations:
-            num = self.apply_operation(num, operation)
-            if num % divisor == 0:
-                num = divisor 
-            
-        return num % divisor == 0
+        if operator == '*' and value == 'old':
+            new = old**2
+        elif operator == '+':
+            new = old + value
+        elif operator == '*':
+            new = old * value
+        
+        return new
+
+    def is_divisible_by(self, divisor, part_2_rules):
+        return self.values[divisor] % divisor == 0 if part_2_rules else self.value % divisor == 0
     
     def __str__(self):
-        return f'Item({self.start} with {len(self.operations)} operations added)'
+        return f'Item({self.value})'
     
 class Monkey(object):
     def __init__(self, monkey_data, parent):
@@ -65,13 +79,13 @@ class Monkey(object):
         #print(f'🐒 {self.id} inspecting...')
         for _ in range(len(self.items)):
             item = self.items.pop(0)
-            item.add_operation(self.operation)
+            item.add_operation(self.operation, part_2_rules)
             #print(f'🐒{self.id} check if {item} is divisible by {self.test}')
             
             if not part_2_rules:
-                item = Item(int(item)//3)
+                item = item//3
 
-            if item.is_divisible_by(self.test):
+            if item.is_divisible_by(self.test, part_2_rules):
                 target_monkey = self.true
             else:
                 target_monkey = self.false
@@ -91,6 +105,8 @@ class MonkeyBusiness(object):
 
         for monkey_data in monkey_input: 
             self.monkies.append(Monkey(monkey_data.split('\n'), parent=self))
+        
+        self.primes = [m.test for m in self.monkies]
 
     def play_rounds(self, count, part_2_rules):
         for round in range(1, count+1):
@@ -137,11 +153,10 @@ if __name__ == "__main__":
     if not solve_part_1('data.txt') == 57348:
         raise ValueError("Part 1 Failed")
 
-    print("Running Test Part 2...")
-    if not solve_part_2('test_data.txt') == 2713310158:
-        raise ValueError("Part 2 Test Failed")
-
+    #print("Running Test Part 2...")
+    #if not solve_part_2('test_data.txt') == 2713310158:
+    #   raise ValueError("Part 2 Test Failed")
 
     print("Solving Part 2...")
-    if not solve_part_2('data.txt') == 0:
+    if not solve_part_2('data.txt') == 14106266886:
         raise ValueError("Part 2 Failed")
