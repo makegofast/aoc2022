@@ -145,8 +145,11 @@ def solve_part_2(filename):
     results = [] 
     map = Map(data)
     for row, col in map.find_nodes_with_height(0):
+        print(f'Solving part 2 with {row}:{col}')
         map2 = Map(data)
-        results.append(map.solve((row,col)))
+        distance = map2.solve((row,col))
+        if distance:
+            results.append(distance)
         
     print(f'part 2 results: {results}')
     print(f'part 2 min: {min(results)}')
@@ -162,9 +165,9 @@ if __name__ == "__main__":
         raise ValueError("Test Failed")
 
     print("Running Test Part 2...")
-    if not solve_part_2('test_data.txt') == 0:
+    if not solve_part_2('test_data.txt') == 29:
         raise ValueError("Tests Failed")
 
     print("Solving Part 2...")
-    if not solve_part_2('data.txt') == 0:
+    if not solve_part_2('data.txt') == 416:
         raise ValueError("Test Failed")
